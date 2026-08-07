@@ -7,6 +7,7 @@ import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 from toga.style.pack import ROW
+from toga.style.pack import CENTER
 from shift12h.core.shift import ShiftCalculator
 
 
@@ -18,25 +19,11 @@ class Shift12H(toga.App):
 
         self.shift = ShiftCalculator()
 
-        main_box = toga.Box(style=Pack(direction=COLUMN, padding=5))
-        title_box = toga.Box(style=Pack(direction=ROW, padding=5, alignment="center",width=400,height=30))  
-        context_box = toga.Box(style=Pack(direction=COLUMN, padding=5))
-        select_box = toga.Box(style=Pack(direction=ROW, padding=5))
-
-        self.main_window = toga.MainWindow(title=self.formal_name)
-
-        lblData = toga.Label(
-            "Дата: ",
-            style=Pack(
-                padding=(0, 5),
-                width=50,
-            ),
-        )
         self.txtDataSelection= toga.TextInput(
-            placeholder="Введите дату",
+            placeholder="dd.mm.yyyy",
             style=Pack(
-                padding=(0, 5),
                 width=100,
+                padding=(0, 8),
                 ),
         )
         self.txtDataSelection.on_confirm=self.on_confirm
@@ -44,59 +31,73 @@ class Shift12H(toga.App):
         self.btnToday=toga.Button(
             "Сегодня",
             on_press=self.btnToday_press,
-
+            style=Pack(
+                flex=1,
+            )
         )
 
-        self.txtDataSelection.value = "06.08.2026"
-        title_box.add(lblData)
-        title_box.add(self.txtDataSelection)
-        title_box.add(self.btnToday)
-
-        lbl1smena = toga.Label(
-            "1 смена: 19:00 - 7:00",
-            style=Pack(padding=(0, 5)),
-        )
-        self.lbl1smena_brigada = toga.Label(
-            "_",
-            style=Pack(padding=(0, 5)),
-        )
-        
-        
-        lbl2smena = toga.Label(
-            "2 смена: 7:00 - 19:00",
-            style=Pack(padding=(0, 5)),
-        )
-        self.lbl2smena_brigada = toga.Label(
-            "_",
-            style=Pack(padding=(0, 5)),
-        )
-        
-        btnDo = toga.Button(
+        self.btnDo = toga.Button(
             "До", 
-            style=Pack(padding=(0, 5)),
+            #style=Pack(width=100, margin_right=10),
+            style=Pack(margin_right=8, flex=1),
             on_press=self.btnDo_press,
         )
-        btnPosle = toga.Button(
+        self.btnPosle = toga.Button(
             "После", 
-            style=Pack(padding=(0, 5)),
+            style=Pack(flex=1, margin_left=8),
             on_press=self.btnPosle_press,
         )
-        select_box.add(btnDo)
-        select_box.add(btnPosle)
 
+        lbl1smena = toga.Label("1 смена: 19:00 - 7:00", style=Pack(padding_top=8),)      
+        lbl2smena = toga.Label("2 смена: 7:00 - 19:00", style=Pack(padding_top=8),)
+        self.lbl1smena_brigada = toga.Label("_", style=Pack(padding_top=8),)
+        self.lbl2smena_brigada = toga.Label("_", style=Pack(padding_top=8),)
+        spacer = toga.Box(style=Pack(flex=1))
+        
+         # Верхняя строка: дата + кнопка
+        date_row = toga.Box(style=Pack(direction=ROW, alignment=CENTER, padding_bottom=10))
+        date_row.add(toga.Label("Дата:", style=Pack(width=60, padding_right=8)))
+        date_row.add(self.txtDataSelection)
+        date_row.add(self.btnToday)
 
-        context_box.add(lbl1smena)
-        context_box.add(self.lbl1smena_brigada)
-        context_box.add(lbl2smena)  
-        context_box.add(self.lbl2smena_brigada)
-        context_box.add(select_box)
+        # Нижняя строка: кнопки навигации
+        nav_row = toga.Box(style=Pack(direction=ROW, alignment=CENTER, padding=(0,10,0,10)))
+        nav_row.add(self.btnDo)
+        nav_row.add(self.btnPosle)
 
+         # Основной контейнер
+        content = toga.Box(
+            style=Pack(
+                direction=COLUMN,
+                padding=20,
+                alignment=CENTER,
+                flex=1
+            )
+        )
 
+        # Центральная "карточка"
+        card = toga.Box(
+            style=Pack(
+                direction=COLUMN,
+                padding=16,
+                flex=1
+            )
+        )
 
+        card.add(date_row)
+        card.add(lbl1smena)
+        card.add(self.lbl1smena_brigada)
+        card.add(lbl2smena)
+        card.add(self.lbl2smena_brigada)
+        card.add(spacer)
 
-        main_box.add(title_box)
-        main_box.add(context_box)
-        self.main_window.content = main_box
+        card.add(nav_row)
+
+        content.add(card)
+
+        self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
+        self.main_window.size = (350, 300)
+        self.main_window.content = content
         self.main_window.show()
 
     def btnDo_press(self,widget):
