@@ -1,13 +1,13 @@
 """
 Программа для отображение информации о ночной и дневной смене
 """
-from .models.session import Session
+from shift12h.models.session import Session
 from datetime import datetime
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 from toga.style.pack import ROW
-from .core.shift import ShiftCalculator
+from shift12h.core.shift import ShiftCalculator
 
 
 
@@ -39,7 +39,7 @@ class Shift12H(toga.App):
                 width=100,
                 ),
         )
-        self.txtDataSelection.on_confirm=self.update_shift
+        self.txtDataSelection.on_confirm=self.on_confirm
                                    
         self.btnToday=toga.Button(
             "Сегодня",
@@ -107,14 +107,34 @@ class Shift12H(toga.App):
 
     def btnToday_press(self, widget):
         self.set_today()
+        self.update_shift()
+
+    def on_confirm(self, widget):
+        self.update_shift()    
+      
 
     def set_today(self):
         today=datetime.today()
         self.session.current_date = today
         self.txtDataSelection.value = today.strftime("%d.%m.%Y")
 
-    def update_shift(self,widget):
-        night, day = self.shift.get_shift(self.session.current_date)
+        #night, day = self.shift.get_shift(today)
+        #self.lbl1smena_brigada.text = f"Бригада №{night}"
+        #self.lbl2smena_brigada.text = f"Бригада №{day}"
+        
+        
+
+
+
+    def update_shift(self):
+        try:
+            current_date =datetime.strptime(self.txtDataSelection.value, "%d.%m.%Y").date()
+        except ValueError:
+            self.lbl1smena_brigada.text = "Ошибка даты"
+            self.lbl2smena_brigada.text = "Ошибка даты"
+            return
+
+        night, day = self.shift.get_shift(current_date)
         self.lbl1smena_brigada.text = f"Бригада №{night}"
         self.lbl2smena_brigada.text = f"Бригада №{day}"
 

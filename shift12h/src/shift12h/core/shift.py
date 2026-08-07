@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from shift12h.models.session import Session
 
 class ShiftCalculator:
     def __init__(self):
@@ -25,6 +26,8 @@ class ShiftCalculator:
         Возвращает:
         (ночная_бригада, дневная_бригада)
         """
+        #date_value=Session.current_date
+
 
         if isinstance(date_value, str): #принятое значение является строкой
             date_value = datetime.strptime(date_value, "%d.%m.%Y").date() # преобразуем её к типу date
