@@ -179,5 +179,3 @@ class Shift12H(toga.App):
 
 def main():
     return Shift12H()
-
-#TODO: 07.08.2026 
