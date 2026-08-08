@@ -2,13 +2,16 @@
 Программа для отображение информации о ночной и дневной смене
 """
 from shift12h.models.session import Session
-from datetime import datetime
+from datetime import date, datetime
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 from toga.style.pack import ROW
 from toga.style.pack import CENTER
 from shift12h.core.shift import ShiftCalculator
+from shift12h.ui.date_input import DateInput
+from shift12h.ui.date_picker import DatePicker
+
 
 
 
@@ -19,14 +22,23 @@ class Shift12H(toga.App):
 
         self.shift = ShiftCalculator()
 
-        self.txtDataSelection= toga.TextInput(
-            placeholder="dd.mm.yyyy",
-            style=Pack(
-                width=100,
-                padding=(0, 8),
-                ),
+        self.txtDataSelection= DateInput(
+             placeholder="dd.mm.yyyy",
+             style=Pack(
+                 width=100,
+                 padding=(0, 8),
+                 ),
         )
         self.txtDataSelection.on_confirm=self.on_confirm
+
+        self.date_picker = DatePicker(
+            self.on_date_selected
+         )
+
+        self.date_button = toga.Button(
+             "Выбрать дату",
+             on_press=self.on_select_date
+        )
                                    
         self.btnToday=toga.Button(
             "Сегодня",
@@ -58,6 +70,7 @@ class Shift12H(toga.App):
         date_row = toga.Box(style=Pack(direction=ROW, alignment=CENTER, padding_bottom=10))
         date_row.add(toga.Label("Дата:", style=Pack(width=60, padding_right=8)))
         date_row.add(self.txtDataSelection)
+        date_row.add(self.date_button)
         date_row.add(self.btnToday)
 
         # Нижняя строка: кнопки навигации
@@ -100,6 +113,21 @@ class Shift12H(toga.App):
         self.main_window.content = content
         self.main_window.show()
 
+    def on_date_selected(self, selected_date):
+        self.txtDataSelection.value = selected_date.strftime(
+            "%d.%m.%Y"
+        )
+        self.update_shift()
+
+    def on_select_date(self, wdget):
+        current_date = self.txtDataSelection.get_date()
+
+        if current_date is None:
+            current_date = date.today() 
+
+        self.date_picker.show(current_date)
+            
+
     def btnDo_press(self,widget):
         pass
 
@@ -112,6 +140,8 @@ class Shift12H(toga.App):
 
     def on_confirm(self, widget):
         self.update_shift()    
+
+    
       
 
     def set_today(self):
@@ -130,10 +160,15 @@ class Shift12H(toga.App):
     def update_shift(self):
         try:
             current_date =datetime.strptime(self.txtDataSelection.value, "%d.%m.%Y").date()
+            #current_date =  self.txtDataSelection.get_date() # Возвращает None Если такой даты нет
+           
+
         except ValueError:
             self.lbl1smena_brigada.text = "Ошибка даты"
             self.lbl2smena_brigada.text = "Ошибка даты"
             return
+
+        
 
         night, day = self.shift.get_shift(current_date)
         self.lbl1smena_brigada.text = f"Бригада №{night}"
