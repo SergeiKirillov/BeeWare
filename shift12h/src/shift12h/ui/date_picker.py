@@ -1,69 +1,280 @@
 import toga
+import calendar
+
 from datetime import date
+from functools import partial
+
 from toga.style import Pack
-from toga.style.pack import COLUMN, ROW, CENTER
+from toga.style.pack import COLUMN, ROW
+
+
+MONTHS = [
+    "",
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь",
+]
+
+
+WEEKDAYS = [
+    "Пн",
+    "Вт",
+    "Ср",
+    "Чт",
+    "Пт",
+    "Сб",
+    "Вс",
+]
 
 
 class DatePicker:
-    def __init__(self, app, on_date_selected):
+
+    def __init__(self,app,on_date_selected):
+
         self.app = app
         self.on_date_selected = on_date_selected
+
         self.window = None
+        self.current_date = date.today()
 
-    def show(self, current_date:date):
-        self.window = toga.Window(title="Выбор даты", size=(300, 200))
-        day_label=toga.Label("День:",style=Pack(margin=5))
-        self.day_input = toga.TextInput(value=f"{current_date.day:02d}")
-        month_label=toga.Label("Месяц:",style=Pack(margin=5))
-        self.month_input = toga.TextInput(value=f"{current_date.month:02d}")
-        year_label=toga.Label("Год:",style=Pack(margin=5))
-        self.year_input = toga.TextInput(value=f"{current_date.year}")
-        cancel_button = toga.Button("Отмена", on_press=self.close, style=Pack(margin=5))
-        ok_button = toga.Button("Выбрать", on_press=self.select_date, style=Pack(margin=5))
+        self.calendar_box = None
+        self.title_label = None
 
+    def show(self, current_date):
 
-        window_box = toga.Box(style=Pack(direction=COLUMN, margin=10, alignment=CENTER))
+        self.current_date = current_date
 
-        window_box.add(day_label)
-        window_box.add(self.day_input)
+        self.window = toga.Window(
+            title="Выбор даты"
+        )
 
-        window_box.add(month_label)
-        window_box.add(self.month_input)
+        self.create_interface()
 
-        window_box.add(year_label)
-        window_box.add(self.year_input)
-
-        btn_box = toga.Box(style=Pack(direction=ROW, margin=10, alignment=CENTER))
-        btn_box.add(cancel_button)
-        btn_box.add(ok_button)
-
-        window_box.add(btn_box)
-
-        self.window.content = window_box
         self.window.show()
 
-    def close(self, widget):
-        if self.window:
-            self.window.close()
-            self.window = None
+    def create_interface(self):
 
-    def select_date(self, widget):
-        try:
-            selected_date = date(
-                int(self.year_input.value),
-                int(self.month_input.value),
-                int(self.day_input.value)
+        self.title_label = toga.Label(
+            "",
+            style=Pack(
+                margin=5
             )
-            
-        except ValueError:
-            # Обработка некорректной даты
-            self.day_input.value = "Ошибка"
-            self.month_input.value = "Ошибка"
-            self.year_input.value = "Ошибка"
-            self.app.main_window.info_dialog("Ошибка", "Некорректная дата. Пожалуйста, введите правильную дату.")
-            return
+        )
 
-        
-        self.on_date_selected(selected_date)
-        self.close(widget)
-        
+        self.calendar_box = toga.Box(
+            style=Pack(
+                direction=COLUMN,
+                margin=10
+            )
+        )
+
+        main_box = toga.Box(
+            style=Pack(
+                direction=COLUMN,
+                margin=10
+            )
+        )
+
+        main_box.add(
+            self.title_label
+        )
+
+        main_box.add(
+            self.create_navigation()
+        )
+
+        main_box.add(
+            self.calendar_box
+        )
+
+        cancel_button = toga.Button(
+            "Отмена",
+            on_press=self.close,
+            style=Pack(
+                flex=1,
+                margin=5
+            )
+        )
+
+        main_box.add(
+            cancel_button
+        )
+
+        self.window.content = main_box
+
+        self.update_calendar()
+
+    def create_navigation(self):
+
+        previous_button = toga.Button(
+            "←",
+            on_press=self.previous_month,
+            style=Pack(
+                flex=1,
+                margin=5
+            )
+        )
+
+        next_button = toga.Button(
+            "→",
+            on_press=self.next_month,
+            style=Pack(
+                flex=1,
+                margin=5
+            )
+        )
+
+        return toga.Box(
+            children=[
+                previous_button,
+                next_button
+            ],
+            style=Pack(
+                direction=ROW
+            )
+        )
+
+    def previous_month(self, widget):
+
+        if self.current_date.month == 1:
+
+            self.current_date = date(
+                self.current_date.year - 1,
+                12,
+                1
+            )
+
+        else:
+
+            self.current_date = date(
+                self.current_date.year,
+                self.current_date.month - 1,
+                1
+            )
+
+        self.update_calendar()
+
+    def next_month(self, widget):
+
+        if self.current_date.month == 12:
+
+            self.current_date = date(
+                self.current_date.year + 1,
+                1,
+                1
+            )
+
+        else:
+
+            self.current_date = date(
+                self.current_date.year,
+                self.current_date.month + 1,
+                1
+            )
+
+        self.update_calendar()
+
+    def update_calendar(self):
+
+        self.title_label.text = (
+            f"{MONTHS[self.current_date.month]} "
+            f"{self.current_date.year}"
+        )
+
+        self.calendar_box.children.clear()
+
+        week_header = toga.Box(
+            style=Pack(
+                direction=ROW
+            )
+        )
+
+        for weekday in WEEKDAYS:
+
+            label = toga.Label(
+                weekday,
+                style=Pack(
+                    flex=1,
+                    margin=2
+                )
+            )
+
+            week_header.add(label)
+
+        self.calendar_box.add(
+            week_header
+        )
+
+        weeks = calendar.monthcalendar(
+            self.current_date.year,
+            self.current_date.month
+        )
+
+        for week in weeks:
+
+            week_box = toga.Box(
+                style=Pack(
+                    direction=ROW
+                )
+            )
+
+            for day in week:
+
+                if day == 0:
+
+                    button = toga.Button(
+                        "",
+                        style=Pack(
+                            flex=1,
+                            margin=2
+                        )
+                    )
+
+                    button.enabled = False
+
+                else:
+
+                    button = toga.Button(
+                        str(day),
+                        on_press=partial(
+                            self.select_day,
+                            day
+                        ),
+                        style=Pack(
+                            flex=1,
+                            margin=2
+                        )
+                    )
+
+                week_box.add(button)
+
+            self.calendar_box.add(
+                week_box
+            )
+
+    def select_day(self, day, widget):
+
+        selected_date = date(
+            self.current_date.year,
+            self.current_date.month,
+            day
+        )
+
+        self.on_date_selected(
+            selected_date
+        )
+
+        self.window.close()
+
+    def close(self, widget):
+
+        self.window.close()
