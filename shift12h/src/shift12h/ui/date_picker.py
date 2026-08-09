@@ -227,8 +227,8 @@ class DatePicker:
                 )
             )
 
+            
             for day in week:
-
                 if day == 0:
 
                     button = toga.Button(
