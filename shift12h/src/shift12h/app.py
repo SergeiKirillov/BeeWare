@@ -32,12 +32,17 @@ class Shift12H(toga.App):
         self.txtDataSelection.on_confirm=self.on_confirm
 
         self.date_picker = DatePicker(
+            self,
             self.on_date_selected
          )
 
         self.date_button = toga.Button(
              "Выбрать дату",
-             on_press=self.on_select_date
+             on_press=self.on_btn_select_date,
+             style=Pack(
+                 flex=1,
+                 margin=5
+             )
         )
                                    
         self.btnToday=toga.Button(
@@ -45,6 +50,7 @@ class Shift12H(toga.App):
             on_press=self.btnToday_press,
             style=Pack(
                 flex=1,
+                margin=5
             )
         )
 
@@ -67,11 +73,14 @@ class Shift12H(toga.App):
         spacer = toga.Box(style=Pack(flex=1))
         
          # Верхняя строка: дата + кнопка
-        date_row = toga.Box(style=Pack(direction=ROW, align_items=CENTER, margin_bottom=10))
+        date_row = toga.Box(style=Pack(direction=ROW, flex=1,align_items=CENTER, margin_bottom=10))
         date_row.add(toga.Label("Дата:", style=Pack(width=60, margin_right=8)))
         date_row.add(self.txtDataSelection)
-        date_row.add(self.date_button)
-        date_row.add(self.btnToday)
+
+        date_buttons = toga.Box(
+            children=[self.date_button, self.btnToday],
+            style=Pack(direction=ROW, flex=1, margin_left=8)
+        )    
 
         # Нижняя строка: кнопки навигации
         nav_row = toga.Box(style=Pack(direction=ROW, align_items=CENTER, margin=(0,10,0,10)))
@@ -88,6 +97,51 @@ class Shift12H(toga.App):
             )
         )
 
+        self.lblSelectedDate = toga.Label("", style=Pack(margin_bottom=10))
+
+        selected_date_box=toga.Box(
+            children=[self.lblSelectedDate],
+            style=Pack(
+                direction=ROW, flex=1, align_items=CENTER, margin_bottom=10
+            )
+        )
+
+        night_box = toga.Box(
+            children=[
+                lbl1smena, 
+                self.lbl1smena_brigada, 
+            ],
+            style=Pack(
+                direction=COLUMN,
+                margin=16,
+                flex=1
+            )
+        )
+
+        day_box = toga.Box(
+            children=[
+                lbl2smena, 
+                self.lbl2smena_brigada, 
+            ],
+            style=Pack(
+                direction=COLUMN,
+                margin=16,
+                flex=1
+            )
+        )
+
+        shift_box=toga.Box(
+            children=[
+                night_box, 
+                day_box
+            ],
+            style=Pack(
+                direction=ROW,
+                flex=1
+            )
+        )
+
+
         # Центральная "карточка"
         card = toga.Box(
             style=Pack(
@@ -98,12 +152,9 @@ class Shift12H(toga.App):
         )
 
         card.add(date_row)
-        card.add(lbl1smena)
-        card.add(self.lbl1smena_brigada)
-        card.add(lbl2smena)
-        card.add(self.lbl2smena_brigada)
-        card.add(spacer)
-
+        card.add(date_buttons)
+        card.add(selected_date_box)
+        card.add(shift_box)
         card.add(nav_row)
 
         content.add(card)
@@ -114,13 +165,14 @@ class Shift12H(toga.App):
         self.main_window.show()
 
     def on_date_selected(self, selected_date):
+        self.session.current_date = selected_date
         self.txtDataSelection.value = selected_date.strftime(
             "%d.%m.%Y"
         )
         self.update_shift()
 
-    def on_select_date(self, wdget):
-        current_date = self.txtDataSelection.get_date()
+    def on_btn_select_date(self, wdget):
+        current_date = self.session.current_date
 
         if current_date is None:
             current_date = date.today() 
@@ -139,24 +191,53 @@ class Shift12H(toga.App):
         self.update_shift()
 
     def on_confirm(self, widget):
-        self.update_shift()    
+        #Получаем дату из текстового поля
+        #Переводи её в объект date
+        #Если она корректная то сохраняем в Seeeion.current_date и обновляем отображение смен
+        date_selected = self.txtDataSelection.get_date()
+        if date_selected is None:
+            self.txtDataSelection.value = "Это не дата"
+            return
+        self.on_date_selected(date_selected)
+
 
     def set_today(self):
-        today=datetime.today()
-        self.txtDataSelection.value = today.strftime("%d.%m.%Y")
-        self.update_shift()
+        #today=datetime.today()
+#        self.txtDataSelection.value = today.strftime("%d.%m.%Y")
+#        self.update_shift()
+        today = date.today()
+        self.on_date_selected(today)
+        #self.update_shift()
+
 
     def update_shift(self):
-        current_date =  self.txtDataSelection.get_date() # Возвращает None Если такой даты нет
-           
+        # current_date =  self.txtDataSelection.get_date() # Возвращает None Если такой даты нет
+        # if current_date is None:
+        #     self.lbl1smena_brigada.text = "Ошибка даты"
+        #     self.lbl2smena_brigada.text = "Ошибка даты" 
+        #     return    
+        # night, day = self.shift.get_shift(current_date)
+        # self.lbl1smena_brigada.text = f"Бригада №{night}"
+        # self.lbl2smena_brigada.text = f"Бригада №{day}"
+        #-------------------------------------------------
+
+        current_date = self.txtDataSelection.get_date()
+
+
+        # Возвращает None Если такой даты нет
         if current_date is None:
-            self.lbl1smena_brigada.text = "Ошибка даты"
-            self.lbl2smena_brigada.text = "Ошибка даты" 
-            return    
-        
+            return 
+           
+        self.session.current_date=current_date
         night, day = self.shift.get_shift(current_date)
+        self.lblSelectedDate.text = f"Выбрана дата: {current_date.strftime('%d.%m.%Y')}"
+        self.session.night_shift = night
+        self.session.day_shift = day
         self.lbl1smena_brigada.text = f"Бригада №{night}"
         self.lbl2smena_brigada.text = f"Бригада №{day}"
+        
+        
+
 
         
 
