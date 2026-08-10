@@ -11,26 +11,7 @@ from toga.style.pack import CENTER
 from shift12h.core.shift import ShiftCalculator
 from shift12h.ui.date_input import DateInput
 from shift12h.ui.date_picker import DatePicker
-from shift12h.ui.style import (
-    MAIN_STYLE,
-    BOX_DATA_SELECT,
-    BOX_DATA_SELECT_TITLE,
-    BOX_DATA_SELECT_BUTTON,
-    BOX_CONTENT,
-    BOX_CONTENT_DATA,
-    BOX_CONTENT_INFO,
-    BOX_CONTENT_INFO_NIGHT,
-    BOX_CONTENT_INFO_DAY,
-    BOX_SELECT_DAY_BUTTON,
-
-
-    DATE_TITLE_STYLE,
-    DATE_INPUT_STYLE,
-    SHIFT_BOX_STYLE,
-    BUTTON_STYLE,
-    SHIFT_VALUE_STYLE,
-    SHIFT_TITLE_STYLE,
-    NAV_STYLE)
+from shift12h.ui.style import MAIN_STYLE,DATE_TITLE_STYLE,DATE_INPUT_STYLE,SHIFT_BOX_STYLE,BUTTON_STYLE,SHIFT_VALUE_STYLE,SHIFT_TITLE_STYLE,NAV_STYLE
 
 
 
@@ -43,112 +24,46 @@ class Shift12H(toga.App):
 
         self.shift = ShiftCalculator()
 
-#---------------------------------------------------------------------------------------------
-
-    #------Часть для выбора дня
-        lblDataTitle = toga.Label(
-            "Дата:", 
-            style=DATE_TITLE_STYLE
-        ) #Pack(width=60, margin_right=8
-
         self.txtDataSelection= DateInput(
              placeholder="dd.mm.yyyy",
-             style = DATE_INPUT_STYLE,   
+             style = DATE_INPUT_STYLE,
+            #  style=Pack(
+            #      width=100,
+            #      margin=(0, 8),
+            #      ),
         )
         self.txtDataSelection.on_confirm=self.on_confirm
 
         self.date_picker = DatePicker(
             self,
             self.on_date_selected
-        )
-
-         # Верхняя строка: дата + кнопка
-        date_row = toga.Box(
-            children=[
-                lblDataTitle,
-                self.txtDataSelection,
-            ],
-            style=Pack(direction=ROW, flex=1,align_items=CENTER, margin_bottom=10)
-        )
-        
+         )
 
         self.date_button = toga.Button(
              "Выбрать дату",
              on_press=self.on_btn_select_date,
              style=BUTTON_STYLE,
-        )                  
+            #  style=Pack(
+            #      flex=1,
+            #      margin=5
+            #  )
+        )
+                                   
         self.btnToday=toga.Button(
             "Сегодня",
             on_press=self.btnToday_press,
-            style = BUTTON_STYLE, 
-        )
-        date_buttons = toga.Box(
-            children=[
-                self.date_button, 
-                self.btnToday
-            ],
-            style=BUTTON_STYLE,
-        )   
-
-        box_data_select = toga.Box(
-            children=[
-                date_row,
-                date_buttons,
-            ],
-            style=BOX_DATA_SELECT,
-        ) 
-    
-    #------Часть отвечающая вывода информации о бригадах
-
-        self.lblSelectedDate = toga.Label("", style=Pack(margin_bottom=5))
-        lbl1smena = toga.Label("1 смена: 19:00 - 7:00", style=SHIFT_TITLE_STYLE,)      
-        lbl2smena = toga.Label("2 смена: 7:00 - 19:00", style=SHIFT_TITLE_STYLE,)
-        self.lbl1smena_brigada = toga.Label("_", style=SHIFT_VALUE_STYLE,)
-        self.lbl2smena_brigada = toga.Label("_", style=SHIFT_VALUE_STYLE,)
-
-        selected_date_box=toga.Box(
-            children=[self.lblSelectedDate],
-            style=BOX_CONTENT_DATA,
+            style = BUTTON_STYLE,
+            # style=Pack(
+            #     flex=1,
+            #     margin=5
+            # )
         )
 
-        night_box = toga.Box(
-            children=[
-                lbl1smena, 
-                self.lbl1smena_brigada, 
-            ],
-            #style=Pack(direction=COLUMN,margin=16,flex=1)
-            style=BOX_CONTENT_INFO_NIGHT
-        )
-
-        day_box = toga.Box(
-            children=[
-                lbl2smena, 
-                self.lbl2smena_brigada, 
-            ],
-            style=BOX_CONTENT_INFO_DAY
-        )
-
-        box_content_info = toga.Box(
-            children=[
-                night_box,
-                day_box,
-            ],
-            style=BOX_CONTENT_INFO
-        )
-
-        shift_box=toga.Box(
-            children=[
-                selected_date_box,
-                box_content_info
-            ],
-            style=BOX_CONTENT,
-        )
-
-
-    #------Кнопки предыдущий - следующий деень
         self.btnDo = toga.Button(
             "До", 
+            #style=Pack(width=100, margin_right=10),
             style=Pack(margin_right=8, flex=1),
+            #style=NAV_BUTTON_STYLE,  
             on_press=self.btnDo_press,
         )
         self.btnPosle = toga.Button(
@@ -156,27 +71,117 @@ class Shift12H(toga.App):
             style=Pack(flex=1, margin_left=8),
             on_press=self.btnPosle_press,
         )
+
+        # # Нижняя строка: кнопки навигации
+        # nav_row = toga.Box(style=Pack(direction=ROW, align_items=CENTER, margin=(0,10,0,10)))
+        # nav_row.add(self.btnDo)
+        # nav_row.add(self.btnPosle)
+
         nav_row = toga.Box(
             children=[
                 self.btnDo,
                 self.btnPosle],
-                #style=NAV_STYLE,
-                style=BOX_SELECT_DAY_BUTTON
+                style=NAV_STYLE,
             )
-    #-------------------------------------
+        
 
+        # lbl1smena = toga.Label("1 смена: 19:00 - 7:00", style=Pack(margin_top=8),)      
+        # lbl2smena = toga.Label("2 смена: 7:00 - 19:00", style=Pack(margin_top=8),)
+        # self.lbl1smena_brigada = toga.Label("_", style=Pack(margin_top=8),)
+        # self.lbl2smena_brigada = toga.Label("_", style=Pack(margin_top=8),)
+        # spacer = toga.Box(style=Pack(flex=1))
+        lbl1smena = toga.Label("1 смена: 19:00 - 7:00", style=SHIFT_TITLE_STYLE,)      
+        lbl2smena = toga.Label("2 смена: 7:00 - 19:00", style=SHIFT_TITLE_STYLE,)
+        self.lbl1smena_brigada = toga.Label("_", style=SHIFT_VALUE_STYLE,)
+        self.lbl2smena_brigada = toga.Label("_", style=SHIFT_VALUE_STYLE,)
+        
+        
+         # Верхняя строка: дата + кнопка
+        date_row = toga.Box(style=Pack(direction=ROW, flex=1,align_items=CENTER, margin_bottom=10))
+        date_row.add(toga.Label("Дата:", style=DATE_TITLE_STYLE)) #Pack(width=60, margin_right=8)
+        date_row.add(self.txtDataSelection)
 
+        date_buttons = toga.Box(
+            children=[self.date_button, self.btnToday],
+            style=BUTTON_STYLE,
+            #style=Pack(direction=ROW, flex=1, margin_left=8)
+        )    
+
+        
         # Основной контейнер
-        content = toga.Box(
+        # content = toga.Box(
+        #     style=Pack(
+        #         direction=COLUMN,
+        #         margin=20,
+        #         align_items=CENTER,
+        #         flex=1
+        #     )
+        # )
+        content = toga.Box(style=MAIN_STYLE)
+
+        self.lblSelectedDate = toga.Label("", style=Pack(margin_bottom=10))
+
+        selected_date_box=toga.Box(
+            children=[self.lblSelectedDate],
+            style=Pack(
+                direction=ROW, flex=1, align_items=CENTER, margin_bottom=10
+            )
+        )
+
+        night_box = toga.Box(
             children=[
-                #date_row,
-                #date_buttons,
-                box_data_select
-                shift_box,
-                nav_row
+                lbl1smena, 
+                self.lbl1smena_brigada, 
             ],
-            style=MAIN_STYLE)
-#       content.add(card)
+            style=Pack(
+                direction=COLUMN,
+                margin=16,
+                flex=1
+            )
+        )
+
+        day_box = toga.Box(
+            children=[
+                lbl2smena, 
+                self.lbl2smena_brigada, 
+            ],
+            style=Pack(
+                direction=COLUMN,
+                margin=16,
+                flex=1
+            )
+        )
+
+        shift_box=toga.Box(
+            children=[
+                night_box, 
+                day_box
+            ],
+            # style=Pack(
+            #     direction=ROW,
+            #     flex=1
+            # )
+            style=SHIFT_BOX_STYLE,
+        )
+
+
+        # Центральная "карточка"
+        card = toga.Box(
+            style=Pack(
+                direction=COLUMN,
+                margin=16,
+                flex=1
+            )
+        )
+
+        card.add(date_row)
+        card.add(date_buttons)
+        card.add(selected_date_box)
+        card.add(shift_box)
+        card.add(nav_row)
+
+        content.add(card)
+
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
         self.main_window.size = (350, 600)
         self.main_window.content = content
