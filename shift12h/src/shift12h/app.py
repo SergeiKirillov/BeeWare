@@ -52,7 +52,7 @@ class Shift12H(toga.App):
 
         self.txtDataSelection= DateInput(
              placeholder="dd.mm.yyyy",
-             #style = DATE_INPUT_STYLE,   
+             style = DATE_INPUT_STYLE,   
         )
         self.txtDataSelection.on_confirm=self.on_confirm
 
@@ -75,12 +75,12 @@ class Shift12H(toga.App):
         self.date_button = toga.Button(
              "Выбрать дату",
              on_press=self.on_btn_select_date,
-             #style=BUTTON_STYLE,
+             style=BUTTON_STYLE,
         )                  
         self.btnToday=toga.Button(
             "Сегодня",
             on_press=self.btnToday_press,
-            #style = BUTTON_STYLE, 
+            style = BUTTON_STYLE, 
         )
         date_buttons = toga.Box(
             children=[
@@ -104,19 +104,19 @@ class Shift12H(toga.App):
         self.lblSelectedDate = toga.Label("", style=Pack(margin_bottom=5))
         lbl1smena = toga.Label(
             "1 смена: 19:00 - 7:00", 
-            #style=SHIFT_TITLE_STYLE,
+            style=SHIFT_TITLE_STYLE,
         )      
         lbl2smena = toga.Label(
             "2 смена: 7:00 - 19:00", 
-            #style=SHIFT_TITLE_STYLE,
+            style=SHIFT_TITLE_STYLE,
         )
         self.lbl1smena_brigada = toga.Label(
             "_", 
-            #style=SHIFT_VALUE_STYLE,
+            style=SHIFT_VALUE_STYLE,
             )
         self.lbl2smena_brigada = toga.Label(
             "_", 
-            #style=SHIFT_VALUE_STYLE,
+            style=SHIFT_VALUE_STYLE,
             )
 
         box_content_data=toga.Box(
