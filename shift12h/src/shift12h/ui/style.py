@@ -1,12 +1,82 @@
 from toga.style import Pack
 from toga.style.pack import ROW, COLUMN, CENTER
 
+
+#Pack(direction=COLUMN,margin=16,flex=1)
+
+
 #Стиль главного контейнера
+#style=Pack(direction=COLUMN,margin=20,align_items=CENTER,flex=1)
 MAIN_STYLE = Pack(
     direction=COLUMN,
     flex=1,
     margin=5,
     align_items=CENTER,
+)
+
+BOX_DATA_SELECT = Pack(
+    direction=COLUMN,
+    flex=1,
+    margin=2,
+    align_items = CENTER
+)
+
+BOX_DATA_SELECT_TITLE=Pack(
+    direction=ROW,
+    flex=1,
+    margin=2,
+)
+BOX_DATA_SELECT_BUTTON=Pack(
+    direction=ROW,
+    flex=1,
+    margin=2,
+)
+BOX_CONTENT=Pack(
+    direction=COLUMN,
+    flex=1,
+    margin=2,
+)
+
+#Pack(direction=ROW, flex=1, align_items=CENTER, margin_bottom=10)
+BOX_CONTENT_DATA=Pack(
+    direction=COLUMN,
+    flex=1,
+    margin=2,
+)
+
+BOX_CONTENT_INFO=Pack(
+    direction=ROW,
+    flex=1,
+    margin=2,
+)
+#Pack(direction=COLUMN,margin=16,flex=1)
+BOX_CONTENT_INFO_NIGHT=Pack(
+    direction=COLUMN,
+    flex=1,
+    margin=2,
+)
+#Pack(direction=COLUMN,margin=16,flex=1)
+BOX_CONTENT_INFO_DAY=Pack(
+    direction=COLUMN,
+    flex=1,
+    margin=2,
+)
+
+BOX_SELECT_DAY_BUTTON=Pack(
+    direction=ROW,
+    flex=1,
+    margin=2,
+)
+
+#---------------------------------------------------------------------------
+
+#Навигация «До / После»
+#Pack(direction=ROW, align_items=CENTER, margin=(0,10,0,10))
+NAV_STYLE = Pack(
+    direction=ROW,
+    #align_items=CENTER
+    flex=1,
+    margin=5,
 )
 
 #Заголовок
@@ -51,11 +121,7 @@ BUTTON_STYLE = Pack(
     margin=5,
 )
 
-#Навигация «До / После»
-NAV_BUTTON_STYLE = Pack(
-    flex=1,
-    margin=5,
-)
+
 
 
 
