@@ -36,6 +36,8 @@ BOX_CONTENT=Pack(
 BOX_CONTENT_DATA=Pack(
     direction=COLUMN,
     margin=2,
+    align_items=CENTER,
+    
 )
 BOX_CONTENT_INFO=Pack(
     direction=ROW,
@@ -75,14 +77,18 @@ BUTTON_STYLE = Pack(
 )
 
 DATE_TITLE_STYLE = Pack(
+    font_size=12,
     margin_right=5,
+    
 )
 
 SHIFT_TITLE_STYLE = Pack(
+    font_size=12,
     margin_bottom=5,
 )
 
 SHIFT_VALUE_STYLE = Pack(
+    font_size=18,
     margin_top=5,
 )
 

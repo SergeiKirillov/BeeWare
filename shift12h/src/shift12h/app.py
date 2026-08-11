@@ -48,7 +48,7 @@ class Shift12H(toga.App):
         lblDataTitle = toga.Label(
             "Дата:", 
             #style=DATE_TITLE_STYLE
-        ) #Pack(width=60, margin_right=8
+        )
 
         self.txtDataSelection= DateInput(
              placeholder="dd.mm.yyyy",
@@ -68,7 +68,6 @@ class Shift12H(toga.App):
                 self.txtDataSelection,
             ],
             style = BOX_DATA_SELECT_TITLE,
-            #style=Pack(direction=ROW, flex=1,align_items=CENTER, margin_bottom=10)
         )
         
 
@@ -87,7 +86,6 @@ class Shift12H(toga.App):
                 self.date_button, 
                 self.btnToday
             ],
-            #style=BUTTON_STYLE,
             style = BOX_DATA_SELECT_BUTTON,
         )   
 
@@ -101,7 +99,7 @@ class Shift12H(toga.App):
     
     #------Часть отвечающая вывода информации о бригадах
 
-        self.lblSelectedDate = toga.Label("", style=Pack(margin_bottom=5))
+        self.lblSelectedDate = toga.Label("", style=DATE_TITLE_STYLE)
         lbl1smena = toga.Label(
             "1 смена: 19:00 - 7:00", 
             style=SHIFT_TITLE_STYLE,
@@ -129,7 +127,6 @@ class Shift12H(toga.App):
                 lbl1smena, 
                 self.lbl1smena_brigada, 
             ],
-            #style=Pack(direction=COLUMN,margin=16,flex=1)
             style=BOX_CONTENT_INFO_NIGHT
         )
 
@@ -173,7 +170,6 @@ class Shift12H(toga.App):
             children=[
                 self.btnDo,
                 self.btnPosle],
-                #style=NAV_STYLE,
                 style=BOX_SELECT_DAY_BUTTON
             )
     #-------------------------------------
@@ -182,15 +178,12 @@ class Shift12H(toga.App):
         # Основной контейнер
         content = toga.Box(
             children=[
-                #date_row,
-                #date_buttons,
-
                 box_data_select,
                 box_content,
                 nav_row
             ],
             style=MAIN_STYLE)
-#       content.add(card)
+
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
         self.main_window.size = (350, 300)
         self.main_window.content = content
@@ -246,27 +239,13 @@ class Shift12H(toga.App):
 
 
     def set_today(self):
-        #today=datetime.today()
-#        self.txtDataSelection.value = today.strftime("%d.%m.%Y")
-#        self.update_shift()
         today = date.today()
         self.on_date_selected(today)
-        #self.update_shift()
 
 
     def update_shift(self):
-        # current_date =  self.txtDataSelection.get_date() # Возвращает None Если такой даты нет
-        # if current_date is None:
-        #     self.lbl1smena_brigada.text = "Ошибка даты"
-        #     self.lbl2smena_brigada.text = "Ошибка даты" 
-        #     return    
-        # night, day = self.shift.get_shift(current_date)
-        # self.lbl1smena_brigada.text = f"Бригада №{night}"
-        # self.lbl2smena_brigada.text = f"Бригада №{day}"
-        #-------------------------------------------------
-
+        
         current_date = self.txtDataSelection.get_date()
-
 
         # Возвращает None Если такой даты нет
         if current_date is None:
