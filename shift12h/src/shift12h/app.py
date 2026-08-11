@@ -37,11 +37,15 @@ from shift12h.ui.style import (
 
 class Shift12H(toga.App):
     def startup(self):
-
         self.session = Session()
-
         self.shift = ShiftCalculator()
+        self.create_interface()
+        self.update_shift(
+            self.session.current_date
+        )
 
+    
+    def create_interface(self): 
 #---------------------------------------------------------------------------------------------
 
     #------Часть для выбора дня
@@ -206,26 +210,29 @@ class Shift12H(toga.App):
             
 
     def btnDo_press(self,widget):
-        date_selected = self.txtDataSelection.get_date()
-        if date_selected is None:
-            self.txtDataSelection.value = "Это не дата"
-            return
-        date_selected_new=date_selected-timedelta(days=1)
-        self.on_date_selected(date_selected_new)
+        # date_selected = self.txtDataSelection.get_date()
+        # if date_selected is None:
+        #     self.txtDataSelection.value = "Это не дата"
+        #     return
+
+        date_selected_new=self.session.current_date-timedelta(days=1)
+        self.update_shift(date_selected_new)
+
+        #self.on_date_selected(date_selected_new)
 
     def btnPosle_press(self, widget):
-        date_selected = self.txtDataSelection.get_date()
-        if date_selected is None:
-            self.txtDataSelection.value = "Это не дата"
-            return
-        date_selected_new=date_selected+timedelta(days=1)
-        self.on_date_selected(date_selected_new)
+        # date_selected = self.txtDataSelection.get_date()
+        # if date_selected is None:
+        #     self.txtDataSelection.value = "Это не дата"
+        #     return
+        date_selected_new=self.session.current_date+timedelta(days=1)
+        self.update_shift(date_selected_new)
 
 
 
     def btnToday_press(self, widget):
         self.set_today()
-        self.update_shift()
+        #self.update_shift()
 
     def on_confirm(self, widget):
         #Получаем дату из текстового поля
@@ -240,20 +247,23 @@ class Shift12H(toga.App):
 
     def set_today(self):
         today = date.today()
-        self.on_date_selected(today)
+        #self.on_date_selected(today)
+        self.update_shift(today)
 
 
-    def update_shift(self):
+    def update_shift(self, selected_date:date):
         
-        current_date = self.txtDataSelection.get_date()
+        #current_date = self.txtDataSelection.get_date()
+
+        self.txtDataSelection.value = selected_date.strftime("%d.%m.%Y")   
 
         # Возвращает None Если такой даты нет
-        if current_date is None:
+        if selected_date is None:
             return 
            
-        self.session.current_date=current_date
-        night, day = self.shift.get_shift(current_date)
-        self.lblSelectedDate.text = f"Выбрана дата: {current_date.strftime('%d.%m.%Y')}"
+        self.session.current_date=selected_date
+        night, day = self.shift.get_shift(selected_date)
+        self.lblSelectedDate.text = f"Выбрана дата: {selected_date.strftime('%d.%m.%Y')}"
         self.session.night_shift = night
         self.session.day_shift = day
         self.lbl1smena_brigada.text = f"Бригада №{night}"
