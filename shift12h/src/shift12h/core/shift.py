@@ -33,6 +33,10 @@ class ShiftCalculator:
         if isinstance(date_value, str): #принятое значение является строкой
             date_value = datetime.strptime(date_value, "%d.%m.%Y").date() # преобразуем её к типу date
 
+# #[x]: - Если выбранная дата меньше текущей то date_value=base_date
+#         if self.base_date>date_value:
+#             date_value=self.base_date
+
         #отнимаем от тек даты - базовую дату и получаем значение дней 
         days = (date_value - self.base_date).days
 

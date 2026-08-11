@@ -198,7 +198,7 @@ class Shift12H(toga.App):
         self.txtDataSelection.value = selected_date.strftime(
             "%d.%m.%Y"
         )
-        self.update_shift()
+        self.update_shift(selected_date)
 
     def on_btn_select_date(self, wdget):
         current_date = self.session.current_date
