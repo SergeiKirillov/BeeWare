@@ -47,7 +47,7 @@ class Shift12H(toga.App):
     #------Часть для выбора дня
         lblDataTitle = toga.Label(
             "Дата:", 
-            #style=DATE_TITLE_STYLE
+            style=DATE_TITLE_STYLE
         )
 
         self.txtDataSelection= DateInput(
@@ -185,7 +185,7 @@ class Shift12H(toga.App):
             style=MAIN_STYLE)
 
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
-        self.main_window.size = (350, 300)
+        self.main_window.size = (360, 740)
         self.main_window.content = content
         self.main_window.show()
 
@@ -239,7 +239,7 @@ class Shift12H(toga.App):
             self.txtDataSelection.value = "Это не дата"
             return
         #self.on_date_selected(date_selected)
-        self.update_shift
+        self.update_shift(date_selected)
 
 
     def set_today(self):
