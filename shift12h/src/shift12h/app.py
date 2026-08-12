@@ -31,10 +31,6 @@ from shift12h.ui.style import (
     SHIFT_TITLE_STYLE,
 )
 
-
-
-
-
 class Shift12H(toga.App):
     def startup(self):
         self.session = Session()
@@ -242,7 +238,8 @@ class Shift12H(toga.App):
         if date_selected is None:
             self.txtDataSelection.value = "Это не дата"
             return
-        self.on_date_selected(date_selected)
+        #self.on_date_selected(date_selected)
+        self.update_shift
 
 
     def set_today(self):
@@ -277,3 +274,9 @@ class Shift12H(toga.App):
 
 def main():
     return Shift12H()
+
+
+
+#[ ]: Изменение интерфейса для адаптивности
+#[ ]: Календарь на Android
+#[ ]: Информация о пользователях бригады с телефонами и возможность вызова из программы 
