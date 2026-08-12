@@ -108,13 +108,15 @@ class Shift12H(toga.App):
             "2 смена: 7:00 - 19:00", 
             style=SHIFT_TITLE_STYLE,
         )
-        self.lbl1smena_brigada = toga.Label(
+        self.btn1smena_brigada = toga.Button(
             "_", 
-            style=SHIFT_VALUE_STYLE,
+            style=BUTTON_STYLE,
+            on_press=self.open_brigade
             )
-        self.lbl2smena_brigada = toga.Label(
+        self.btn2smena_brigada = toga.Button(
             "_", 
-            style=SHIFT_VALUE_STYLE,
+            style=BUTTON_STYLE,
+            on_press=self.open_brigade,
             )
 
         box_content_data=toga.Box(
@@ -125,7 +127,7 @@ class Shift12H(toga.App):
         box_content_info_night = toga.Box(
             children=[
                 lbl1smena, 
-                self.lbl1smena_brigada, 
+                self.btn1smena_brigada, 
             ],
             style=BOX_CONTENT_INFO_NIGHT
         )
@@ -133,7 +135,7 @@ class Shift12H(toga.App):
         box_content_info_day = toga.Box(
             children=[
                 lbl2smena, 
-                self.lbl2smena_brigada, 
+                self.btn2smena_brigada, 
             ],
             style=BOX_CONTENT_INFO_DAY
         )
@@ -263,9 +265,25 @@ class Shift12H(toga.App):
         self.lblSelectedDate.text = f"Выбрана дата: {selected_date.strftime('%d.%m.%Y')}"
         self.session.night_shift = night
         self.session.day_shift = day
-        self.lbl1smena_brigada.text = f"Бригада №{night}"
-        self.lbl2smena_brigada.text = f"Бригада №{day}"
-        
+        self.btn1smena_brigada.text = f"Бригада №{night}"
+        self.btn2smena_brigada.text = f"Бригада №{day}"
+
+    def open_brigade(self, widget):
+        brigade_number = widget.text.replace("Бригада №", "")
+
+        windowsTwo = toga.Window(
+            title=f"Информация о бригаде №{brigade_number}"
+        )
+
+        lblTitle = toga.Label(
+            f"Сейчас работает бригада №{brigade_number}",
+            style=Pack(
+                margin=20,
+            )
+        )
+        windowsTwo.content = lblTitle
+        windowsTwo.show()
+
         
 
 

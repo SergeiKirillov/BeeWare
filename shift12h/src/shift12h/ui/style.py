@@ -13,7 +13,8 @@ MAIN_STYLE = Pack(
     #flex=1,
     #margin=5,
     # v2
-    padding=15,
+    #padding=15,
+    margin=15,
     gap = 10,
 )
 
@@ -77,8 +78,10 @@ BOX_CONTENT_INFO_NIGHT=Pack(
     # flex=1,
     # margin=2,
     # v2
-    padding_top = 5,
-    padding_bottom = 5,
+    #padding_top = 5,
+    #padding_bottom = 5,
+    margin_top = 5,
+    margin_bottom = 5,
 )
 BOX_CONTENT_INFO_DAY=Pack(
     direction=COLUMN,
@@ -86,8 +89,10 @@ BOX_CONTENT_INFO_DAY=Pack(
     # flex=1,
     # margin=2,
     # v2
-    padding_top = 5,
-    padding_bottom = 5,
+    #padding_top = 5,
+    #padding_bottom = 5,
+    margin_top = 5,
+    margin_bottom = 5,
 )
 # =========================================================
 # Кнопки До / После
@@ -99,7 +104,9 @@ BOX_SELECT_DAY_BUTTON=Pack(
     # margin=2,
     # v2
     gap = 10,
-    padding_top = 10,
+    #padding_top = 10,
+    margin_top = 10,
+
 )
 
 #---------------------------------------------------------------------------
@@ -114,7 +121,8 @@ DATE_TITLE_STYLE = Pack(
     # v1 
     #margin_right=5,   
     # v2
-    padding_top=8,
+    #padding_top=8,
+    margin_top=8,
 )
 
 DATE_INPUT_STYLE = Pack(
@@ -128,7 +136,8 @@ BUTTON_STYLE = Pack(
     # v1
     # margin=5,
     # v2
-    padding = 10,
+    #padding = 10,
+    margin = 10,
 )
 
 
@@ -146,7 +155,8 @@ SHIFT_VALUE_STYLE = Pack(
     # margin_top=5,
     # v2
     font_size=26,
-    padding_top=3,
+    #padding_top=3,
+    margin_top=3,
 )
 
 
