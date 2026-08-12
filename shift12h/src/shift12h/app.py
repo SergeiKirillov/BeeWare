@@ -2,6 +2,8 @@
 Программа для отображение информации о ночной и дневной смене
 """
 from shift12h.models.session import Session
+from shift12h.core.wotkerdb import WorkerDB
+from shift12h.worker_card import WorkerCard
 from datetime import date, datetime, timedelta
 import toga
 from toga.style import Pack
@@ -271,6 +273,10 @@ class Shift12H(toga.App):
     def open_brigade(self, widget):
         brigade_number = widget.text.replace("Бригада №", "")
 
+        worker_db = WorkerDB()
+        #workers = worker_db.get_workers_by_brigade(brigade_number)
+        self.show_workers(brigade_number)
+
         windowsTwo = toga.Window(
             title=f"Информация о бригаде №{brigade_number}"
         )
@@ -281,8 +287,24 @@ class Shift12H(toga.App):
                 margin=20,
             )
         )
+
+        self.worker_box = toga.Box(
+            style=Pack(
+                direction=COLUMN,
+                flex=1,
+            )
+        )
+
+
         windowsTwo.content = lblTitle
         windowsTwo.show()
+
+    def show_workers(self, brigade):
+        self.workers_box.clear()
+        workers = self.worker_db.get_workers_by_brigade(brigade)
+        for worker in workers:
+            card = WorkerCard(worker)
+            self.workers_box.add(card)
 
         
 
