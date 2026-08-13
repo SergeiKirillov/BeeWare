@@ -1,17 +1,22 @@
 """
 Программа для отображение информации о ночной и дневной смене
 """
-from shift12h.models.session import Session
-from shift12h.core.wotkerdb import WorkerDB
-from shift12h.worker_card import WorkerCard
-from shift12h.worker_card import BrigadeWindows
-from datetime import date, datetime, timedelta
 import toga
 from toga.style import Pack
 from toga.style.pack import COLUMN
 from toga.style.pack import ROW
 from toga.style.pack import CENTER
 
+from datetime import date, datetime, timedelta
+from pathlib import Path
+import shutil
+import json
+
+
+from shift12h.models.session import Session
+from shift12h.core.wotkerdb import WorkerDB
+from shift12h.worker_card import WorkerCard
+from shift12h.worker_card import BrigadeWindows
 
 from shift12h.core.shift import ShiftCalculator
 from shift12h.ui.date_input import DateInput
@@ -44,6 +49,7 @@ class Shift12H(toga.App):
         self.update_shift(
             self.session.current_date
         )
+        
 
     
     def create_interface(self): 
@@ -210,28 +216,6 @@ class Shift12H(toga.App):
         self.commands.add(select_file_command)
         self.main_window.show()
 
-    async def select_personal_file(self, widget):
-
-        #print(toga.__version__)
-        #print(hasattr(toga, "OpenFileDialog"))
-        #print(hasattr(toga, "FileDialog"))
-
-        try:
-            result = await self.main_window.dialog(
-                toga.OpenFileDialog(
-                    title="Выберите файл картотеки",
-                )
-            )
-
-            if result:
-                selected_file = result
-                print("Выбран файл:")
-                print(selected_file)
-
-        except Exception as e:
-            print(f"Ошибка выбора файла: {e}")
-
-
     def on_date_selected(self, selected_date):
         self.session.current_date = selected_date
         self.txtDataSelection.value = selected_date.strftime(
@@ -313,15 +297,18 @@ class Shift12H(toga.App):
         brigade_number = widget.text.replace("Бригада №", "")
 
         
-        worker_db = WorkerDB()
+        #worker_db = WorkerDB()
+        personal_file = Path(self.paths.data) / "personal.json"
+        worker_db = WorkerDB(personal_file)
         workers = worker_db.get_workers_by_brigade(brigade_number)
 
-        window = BrigadeWindows(
-                            self,
-                            brigade_number,
-                            workers,
-                        )
-        window.show()
+        if workers is not None:
+            window = BrigadeWindows(
+                                self,
+                                brigade_number,
+                             workers,
+                            )
+            window.show()
         
 
         # #self.show_workers(brigade_number)
@@ -361,7 +348,185 @@ class Shift12H(toga.App):
         )
         window.show()
 
-        
+    async def select_personal_file(self, widget):
+
+        #print(toga.__version__)
+        #print(hasattr(toga, "OpenFileDialog"))
+        #print(hasattr(toga, "FileDialog"))
+
+        try:
+             # ---------------------------------------------------------
+             # 1. Открываем диалог выбора файла
+             # ---------------------------------------------------------
+            result = await self.main_window.dialog(
+                toga.OpenFileDialog(
+                    title="Выберите файл картотеки",
+                )
+            )
+            # Пользователь нажал "Отмена"
+            if not result:
+                return   
+
+            result = Path(result)
+
+            # ---------------------------------------------------------
+            # 2. Проверяем расширение
+            # ---------------------------------------------------------
+            if result.suffix.lower() != ".json":
+                await self.main_window.dialog(
+                    toga.ErrorDialog(
+                        "Ошибка",
+                        "Выберите файл картотеки в формате JSON.",
+                    )
+                )
+                return
+            #-----------------------------------------------------------
+            #  Проверяем стуктуру
+            #-----------------------------------------------------------
+
+            is_valid, message = self.validate_personal_json(
+                    result
+            )
+            if not is_valid:
+                await self.main_window.dialog(
+                    toga.ErrorDialog(
+                        "Ошибка картотеки",
+                        message,
+                    )
+                )
+                return
+
+
+            # ---------------------------------------------------------
+            # 3. Определяем место хранения картотеки
+            # ---------------------------------------------------------
+            data_folder = Path(self.paths.data)
+
+            # На всякий случай создаём папку
+            data_folder.mkdir(parents=True, exist_ok=True)
+
+            target_file = data_folder / "personal.json"
+
+            # ---------------------------------------------------------
+            # 4. Копируем выбранный файл
+            # ---------------------------------------------------------
+            shutil.copy2(result, target_file)
+
+            # ---------------------------------------------------------
+            # 5. Сообщаем пользователю об успехе
+            # ---------------------------------------------------------
+            await self.main_window.dialog(
+                toga.InfoDialog(
+                    "Картотека",
+                    f"Файл успешно сохранён:\n\n{target_file}",
+                )
+            )
+
+            print(f"Исходный файл: {result}")
+            print(f"Рабочая картотека: {target_file}")
+            
+        except Exception as e:
+        # ---------------------------------------------------------
+        # Обработка ошибок
+        # ---------------------------------------------------------
+            print(f"Ошибка при выборе картотеки: {e}")
+
+            await self.main_window.dialog(
+                toga.ErrorDialog(
+                    "Ошибка",
+                    f"Не удалось сохранить файл картотеки:\n\n{e}",
+                )
+            )
+
+
+    def validate_personal_json(self, file_path):
+        try:
+             with open(file_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except json.JSONDecodeError as e:
+            return False, f"Некорректный JSON:\n{e}"
+        except OSError as e:
+            return False, f"Не удалось прочитать файл:\n{e}"
+
+
+        # ---------------------------------------------------------
+        # Корень JSON
+        # ---------------------------------------------------------
+        if not isinstance(data, dict):
+            return False, "Корень JSON должен быть объектом."
+
+        # ---------------------------------------------------------
+        # workers
+        # ---------------------------------------------------------
+        if "workers" not in data:
+            return False, "Отсутствует поле 'workers'."
+
+        workers= data["workers"]
+
+        if not isinstance(workers, list):
+            return False, "Поле 'workers' должно быть списком."
+
+        if not workers:
+            return False, "Список 'workers' пуст."
+
+        # ---------------------------------------------------------
+        # Проверяем работников
+        # ---------------------------------------------------------
+        required_fields = {
+            "id": int,
+            "brigade": int,
+            "fio": str,
+            "shop": str,
+            "position": str,
+            "phone": str,
+        }
+
+        for index, worker in enumerate(workers, start=1):
+
+            if not isinstance(worker, dict):
+                return False, (
+                    f"Работник №{index} должен быть объектом."
+            )
+
+            # Проверяем наличие и тип каждого поля
+            for field, expected_type in required_fields.items():
+
+                if field not in worker:
+                    return False, (
+                        f"Работник №{index}: "
+                        f"отсутствует поле '{field}'."
+                    )
+
+                if not isinstance(worker[field], expected_type):
+                    return False, (
+                        f"Работник №{index}: "
+                        f"поле '{field}' должно иметь тип "
+                        f"{expected_type.__name__}."
+                )
+
+            # -----------------------------------------------------
+            # Проверяем номер бригады
+            # -----------------------------------------------------
+            if worker["brigade"] not in (1, 2, 3, 4):
+                return False, (
+                    f"Работник №{index}: "
+                    f"недопустимый номер бригады "
+                    f"{worker['brigade']}."
+                )
+
+            # -----------------------------------------------------
+            # Проверяем обязательные строки
+            # -----------------------------------------------------
+            for field in ("fio", "shop", "position"):
+                if not worker[field].strip():
+                    return False, (
+                        f"Работник №{index}: "
+                        f"поле '{field}' не должно быть пустым."
+                )
+
+        return True, "Файл картотеки корректен."
+
+
 
 
         
