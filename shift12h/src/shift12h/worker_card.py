@@ -7,7 +7,9 @@ class WorkerCard(toga.Box):
         super().__init__(
             style=Pack(
                 direction=COLUMN,
-                padding=10,
+                # v1
+                # padding=10,
+                margin = 10,
             ),
             **kwargs
         )
@@ -18,7 +20,10 @@ class WorkerCard(toga.Box):
             worker["fio"],
             style=Pack(
                 font_size=16,
-                padding_bottom=5,
+                # v1
+                # padding_bottom=5,
+                # v2 
+                margin_bottom=5
             )
         )
 
@@ -26,7 +31,10 @@ class WorkerCard(toga.Box):
         self.shop = toga.Label(
             f'Цех: {worker["shop"]}',
             style=Pack(
-                padding_bottom=3,
+                # v1 
+                # padding_bottom=3,
+                # v2
+                margin_bottom=3
             )
         )
 
@@ -34,7 +42,11 @@ class WorkerCard(toga.Box):
         self.position = toga.Label(
             f'Должность: {worker["position"]}',
             style=Pack(
-                padding_bottom=3,
+                # v1 
+                # padding_bottom=3,
+                # v2
+                margin_bottom=3
+
             )
         )
 
@@ -57,7 +69,9 @@ class BrigadeWindows:
         self.content = toga.Box(
             style=Pack(
                 direction=COLUMN,
-                padding=10,
+                # v1 
+                # padding=10,
+                margin = 10,
                 flex=1,
             )
         )
@@ -78,7 +92,10 @@ class BrigadeWindows:
             card = toga.Box(
                 style=Pack(
                     direction=COLUMN,
-                    padding=10,
+                    #v1 
+                    # padding=10,
+                    # v2
+                    margin=10
                 )
             )
 
@@ -86,21 +103,30 @@ class BrigadeWindows:
                 worker["fio"],
                 style=Pack(
                     font_size=16,
-                    padding_bottom=5,
+                    # v1 
+                    # padding_bottom=5,
+                    # v2
+                    margin_bottom = 5,
                 )
             )
 
             shop = toga.Label(
                 f'Цех: {worker["shop"]}',
                 style=Pack(
-                    padding_bottom=3,
+                    #v1 
+                    # padding_bottom=3,
+                    #v2
+                    margin_bottom=3
                 )
             )
 
             position = toga.Label(
                 f'Должность: {worker["position"]}',
                 style=Pack(
-                    padding_bottom=3,
+                    # v1
+                    # padding_bottom=3,
+                    # v2
+                    margin_bottom=3
                 )
             )
 
@@ -109,7 +135,10 @@ class BrigadeWindows:
                 on_press=lambda widget, phone=worker["phone"]:
                     self.call_worker(phone),
                 style=Pack(
-                    padding_top=5,
+                    # v1 
+                    # padding_top=5,
+                    margin_top=5
+
                 )
             )
 

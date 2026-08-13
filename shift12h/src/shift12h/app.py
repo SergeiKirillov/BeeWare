@@ -11,6 +11,8 @@ from toga.style import Pack
 from toga.style.pack import COLUMN
 from toga.style.pack import ROW
 from toga.style.pack import CENTER
+
+
 from shift12h.core.shift import ShiftCalculator
 from shift12h.ui.date_input import DateInput
 from shift12h.ui.date_picker import DatePicker
@@ -188,11 +190,47 @@ class Shift12H(toga.App):
                 nav_row
             ],
             style=MAIN_STYLE)
+    #---------------------------------------
+        #добавление пункта меню
+        settion_group = toga.Group(
+            "Настройки",
+            order=0,
+        )
+        select_file_command = toga.Command(
+            self.select_personal_file,
+            text="Выбрать файл картотеки",
+            group=settion_group,
+        )
+
+    #---------------------------------------
 
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
         self.main_window.size = (360, 740)
         self.main_window.content = content
+        self.commands.add(select_file_command)
         self.main_window.show()
+
+    async def select_personal_file(self, widget):
+
+        #print(toga.__version__)
+        #print(hasattr(toga, "OpenFileDialog"))
+        #print(hasattr(toga, "FileDialog"))
+
+        try:
+            result = await self.main_window.dialog(
+                toga.OpenFileDialog(
+                    title="Выберите файл картотеки",
+                )
+            )
+
+            if result:
+                selected_file = result
+                print("Выбран файл:")
+                print(selected_file)
+
+        except Exception as e:
+            print(f"Ошибка выбора файла: {e}")
+
 
     def on_date_selected(self, selected_date):
         self.session.current_date = selected_date
