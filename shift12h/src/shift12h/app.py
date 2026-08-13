@@ -82,11 +82,18 @@ class Shift12H(toga.App):
         )
         
 
+#         self.date_button = toga.Button(
+#              "Выбрать дату",
+#              on_press=self.on_btn_select_date,
+#              style=BUTTON_STYLE,
+#         )                  
+
         self.date_button = toga.Button(
-             "Выбрать дату",
-             on_press=self.on_btn_select_date,
-             style=BUTTON_STYLE,
-        )                  
+              "Выбрать картотеку",
+              on_press=self.select_personal_file,
+              style=BUTTON_STYLE,
+         ) 
+
         self.btnToday=toga.Button(
             "Сегодня",
             on_press=self.btnToday_press,
