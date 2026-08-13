@@ -14,10 +14,20 @@ class WorkerDB:
 
         return data["workers"]
 
-    def get_workers_by_brigade(self, brigade:int):
+    def get_workers_by_brigade(self, brigade):
+        int_brigade=int(brigade)
+
         return [
             worker
             for worker in self.workers
-            if worker["brigade"]==brigade
+            if worker["brigade"]==int_brigade
         ]
+
+
+        # print(type(int_brigade));
+        # result = []
+        # for worker in self.workers:
+        #     if worker["brigade"] == int_brigade:
+        #         result.append(worker)
+
    
