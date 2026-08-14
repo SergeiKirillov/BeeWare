@@ -43,8 +43,11 @@ from shift12h.ui.style import (
 
 class Shift12H(toga.App):
     def startup(self):
+        self.install_default_personal()
+
         self.session = Session()
         self.shift = ShiftCalculator()
+
         self.create_interface()
         self.update_shift(
             self.session.current_date
@@ -82,17 +85,17 @@ class Shift12H(toga.App):
         )
         
 
-#         self.date_button = toga.Button(
-#              "Выбрать дату",
-#              on_press=self.on_btn_select_date,
-#              style=BUTTON_STYLE,
-#         )                  
-
         self.date_button = toga.Button(
-              "Выбрать картотеку",
-              on_press=self.select_personal_file,
-              style=BUTTON_STYLE,
-         ) 
+             "Выбрать дату",
+             on_press=self.on_btn_select_date,
+             style=BUTTON_STYLE,
+        )                  
+
+        # self.date_button = toga.Button(
+        #       "Выбрать картотеку",
+        #       on_press=self.select_personal_file,
+        #       style=BUTTON_STYLE,
+        #  ) 
 
         self.btnToday=toga.Button(
             "Сегодня",
@@ -361,6 +364,9 @@ class Shift12H(toga.App):
         #print(hasattr(toga, "OpenFileDialog"))
         #print(hasattr(toga, "FileDialog"))
 
+        
+                
+
         try:
              # ---------------------------------------------------------
              # 1. Открываем диалог выбора файла
@@ -533,7 +539,17 @@ class Shift12H(toga.App):
 
         return True, "Файл картотеки корректен."
 
+    def install_default_personal(self):
+        target = Path(self.paths.data) / "personal.json"
 
+        if target.exists():
+            return
+
+        source = Path(__file__).parent / "data" / "personal.json"
+
+        if source.exists():
+            shutil.copy2(source, target)
+       
 
 
         
