@@ -17,6 +17,7 @@ from shift12h.models.session import Session
 from shift12h.core.wotkerdb import WorkerDB
 from shift12h.worker_card import WorkerCard
 from shift12h.worker_card import BrigadeWindows
+from shift12h.logger import setup_logging, export_log_to_android
 
 from shift12h.core.shift import ShiftCalculator
 from shift12h.ui.date_input import DateInput
@@ -41,8 +42,13 @@ from shift12h.ui.style import (
     SHIFT_TITLE_STYLE,
 )
 
+
+
 class Shift12H(toga.App):
     def startup(self):
+        self.logger = setup_logging()
+        self.logger.info("Запуск shift12h")
+
         self.install_default_personal()
 
         self.session = Session()
@@ -207,16 +213,29 @@ class Shift12H(toga.App):
             ],
             style=MAIN_STYLE)
     #---------------------------------------
+        # #добавление пункта меню
+        # settion_group = toga.Group(
+        #     "Настройки",
+        #     order=0,
+        # )
+        # select_file_command = toga.Command(
+        #     self.select_personal_file,
+        #     text="Выбрать файл картотеки",
+        #     group=settion_group,
+        # )
+    #---------------------------------------
         #добавление пункта меню
         settion_group = toga.Group(
             "Настройки",
             order=0,
         )
         select_file_command = toga.Command(
-            self.select_personal_file,
-            text="Выбрать файл картотеки",
+            self.save_log,
+            text="Сохранить лог НА ТЕЛЕФОНЕ",
             group=settion_group,
         )
+
+
 
     #---------------------------------------
 
@@ -225,6 +244,12 @@ class Shift12H(toga.App):
         self.main_window.content = content
         self.commands.add(select_file_command)
         self.main_window.show()
+
+    def save_log(self, widget):
+        if export_log_to_android():
+            self.logger.info("Лог успешно сохранён")
+        else:
+            self.logger.error("Не удалось сохранить лог")
 
     def on_date_selected(self, selected_date):
         self.session.current_date = selected_date
