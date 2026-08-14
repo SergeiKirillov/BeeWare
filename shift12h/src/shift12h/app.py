@@ -11,13 +11,18 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 import shutil
 import json
+import os
 
 
 from shift12h.models.session import Session
 from shift12h.core.wotkerdb import WorkerDB
 from shift12h.worker_card import WorkerCard
 from shift12h.worker_card import BrigadeWindows
-from shift12h.logger import setup_logging, export_log_to_android
+
+from shift12h.logger_1 import setup_logging
+from shift12h.logger_1 import get_log_file, export_log_to_android
+
+#from shift12h.logger import setup_logging, save_log_to_download
 
 from shift12h.core.shift import ShiftCalculator
 from shift12h.ui.date_input import DateInput
@@ -229,12 +234,22 @@ class Shift12H(toga.App):
             "Настройки",
             order=0,
         )
+        # select_file_command = toga.Command(
+        #     self.save_log,
+        #     text="Сохранить лог НА ТЕЛЕФОНЕ",
+        #     group=settion_group,
+        # )
         select_file_command = toga.Command(
-            self.save_log,
-            text="Сохранить лог НА ТЕЛЕФОНЕ",
+            self.test_copy_log,
+            text="Тест записи на телефон",
             group=settion_group,
         )
-
+            
+        # select_file_command = toga.Command(
+        #     self.test_copy_log,
+        #     text="Сохранение лога",
+        #     group=settion_group
+        # )
 
 
     #---------------------------------------
@@ -246,11 +261,30 @@ class Shift12H(toga.App):
         self.main_window.show()
 
     def save_log(self, widget):
-        if export_log_to_android():
-            self.logger.info("Лог успешно сохранён")
-        else:
-            self.logger.error("Не удалось сохранить лог")
+        # result = export_log_to_android()
 
+        # if result:
+        #     self.logger.info(
+        #         "Экспорт лога завершён успешно"
+        #     )
+        # else:
+        #     self.logger.error(
+        #         "Экспорт лога завершился ошибкой"
+        #     )
+        result = save_log_to_download()
+
+        if result is not None:
+
+            self.logger.info(
+                "Журнал сохранён пользователем"
+            )
+
+        else:
+
+            self.logger.error(
+                "Не удалось сохранить журнал"
+            )
+        
     def on_date_selected(self, selected_date):
         self.session.current_date = selected_date
         self.txtDataSelection.value = selected_date.strftime(
@@ -575,9 +609,120 @@ class Shift12H(toga.App):
         if source.exists():
             shutil.copy2(source, target)
        
+    def test_download(self, widget):
+        try:
+            from java import jclass
 
+            Environment = jclass(
+                "android.os.Environment"
+            )
 
-        
+            download_dir = (
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+            )
+
+            download_dir.mkdirs()
+
+            file_path = os.path.join(
+                str(download_dir),
+                "test_download.txt"
+            )
+
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write(
+                    "Тест записи в Download\n"
+                    "Файл успешно создан приложением.\n"
+                )
+
+            print("Файл создан:", file_path)
+
+        except Exception as e:
+            print("ОШИБКА:", e)
+
+    def test_copy_log_2(self, widget):
+        try:
+            import os
+            import shutil
+
+            source = get_log_file()
+
+            print("Источник:")
+            print(source)
+
+            from java import jclass
+
+            Environment = jclass(
+                "android.os.Environment"
+            )
+
+            download_dir = (
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+            )
+
+            download_dir.mkdirs()
+
+            destination = os.path.join(
+                str(download_dir),
+                "shift12h.log"
+            )
+
+            shutil.copy2(
+                source,
+                destination
+            )
+
+            print("Лог успешно скопирован:")
+            print(destination)
+
+        except Exception as e:
+            print("ОШИБКА:")
+            print(e)
+
+    def test_copy_log(self, widget):
+        try:
+            import os
+            import shutil
+
+            # Файл лога внутри приложения
+            source = self.paths.data / "logs" / "shift12h.log"
+
+            # Папка Download
+            from java import jclass
+
+            Environment = jclass(
+                "android.os.Environment"
+            )
+
+            download_dir = (
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+            )
+
+            download_dir.mkdirs()
+
+            # Куда копируем
+            destination = os.path.join(
+                str(download_dir),
+                "shift12h.log"
+            )
+
+            # Копирование
+            shutil.copy2(
+                source,
+                destination
+            )
+
+            print("Лог скопирован:")
+            print(destination)
+
+        except Exception as e:
+            print("ОШИБКА КОПИРОВАНИЯ:")
+            print(e)    
 
 
 def main():
