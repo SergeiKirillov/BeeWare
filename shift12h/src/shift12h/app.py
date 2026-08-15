@@ -19,10 +19,10 @@ from shift12h.core.wotkerdb import WorkerDB
 from shift12h.worker_card import WorkerCard
 from shift12h.worker_card import BrigadeWindows
 
-from shift12h.logger_1 import setup_logging
-from shift12h.logger_1 import get_log_file, export_log_to_android
+#from shift12h.logger_1 import setup_logging
+#from shift12h.logger_1 import get_log_file, export_log_to_android
 
-#from shift12h.logger import setup_logging, save_log_to_download
+from shift12h.logger import setup_logging, save_log_to_download, get_log_file
 
 from shift12h.core.shift import ShiftCalculator
 from shift12h.ui.date_input import DateInput
@@ -52,7 +52,8 @@ from shift12h.ui.style import (
 class Shift12H(toga.App):
     def startup(self):
         self.logger = setup_logging()
-        self.logger.info("Запуск shift12h")
+        self.logger.info("Выбрана дата: %s", datetime.today())
+        self.logger.info("Приложение Shift12H запущено")
 
         self.install_default_personal()
 
@@ -235,21 +236,21 @@ class Shift12H(toga.App):
             order=0,
         )
         # select_file_command = toga.Command(
-        #     self.save_log,
+        #     self.save_log_0,
         #     text="Сохранить лог НА ТЕЛЕФОНЕ",
         #     group=settion_group,
         # )
-        select_file_command_test = toga.Command(
-            self.test_copy_log,
-            text="Тест записи на телефон",
-            group=settion_group,
-        )
-            
-        # select_file_command = toga.Command(
+        # select_file_command_test = toga.Command(
         #     self.test_copy_log,
-        #     text="Сохранение лога",
-        #     group=settion_group
+        #     text="Тест записи на телефон",
+        #     group=settion_group,
         # )
+            
+        select_file_command_save = toga.Command(
+             self.save_log,
+             text="Сохранение лога",
+             group=settion_group
+         )
 
 
     #---------------------------------------
@@ -257,34 +258,62 @@ class Shift12H(toga.App):
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
         self.main_window.size = (360, 740)
         self.main_window.content = content
-        self.commands.add(select_file_command_test)
+        self.commands.add(select_file_command_save)
         self.main_window.show()
 
-    def save_log(self, widget):
-        # result = export_log_to_android()
-
-        # if result:
-        #     self.logger.info(
-        #         "Экспорт лога завершён успешно"
-        #     )
-        # else:
-        #     self.logger.error(
-        #         "Экспорт лога завершился ошибкой"
-        #     )
+    def save_log_0(self, widget):
         result = save_log_to_download()
 
         if result is not None:
-
             self.logger.info(
                 "Журнал сохранён пользователем"
             )
-
         else:
-
             self.logger.error(
                 "Не удалось сохранить журнал"
             )
-        
+
+    def save_log(self, widget):
+        import os
+        import shutil
+
+        try:
+            source = get_log_file()
+
+            print("SOURCE:", source)
+            print("EXISTS:", source.exists())
+
+            from java import jclass
+
+            Environment = jclass(
+                "android.os.Environment"
+            )
+
+            download_dir = (
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+            )
+
+            download_dir.mkdirs()
+
+            destination = os.path.join(
+                str(download_dir),
+                "shift12h.log"
+            )
+
+            print("DESTINATION:", destination)
+
+            shutil.copy2(
+                source,
+                destination
+            )
+
+            print("COPY OK")
+
+        except Exception as e:
+            print("COPY ERROR:", repr(e))
+
     def on_date_selected(self, selected_date):
         self.session.current_date = selected_date
         self.txtDataSelection.value = selected_date.strftime(
@@ -599,15 +628,30 @@ class Shift12H(toga.App):
         return True, "Файл картотеки корректен."
 
     def install_default_personal(self):
+        self.logger.info("Выбрана дата: %s", datetime.today())
         target = Path(self.paths.data) / "personal.json"
-
+        self.logger.info(f" Папка для хранения пользовательских данных = {target}")
+        #локальная папка для хранения данных приложения
         if target.exists():
+            self.logger.info(f"Файл по этому пути существует и мы выходим ")
+            # Файл существует
             return
+        else:
+            self.logger.info(f"Файл по этому пути НЕ существует")
 
         source = Path(__file__).parent / "data" / "personal.json"
-
+        self.logger.info(f" Источник данных = {source}")
+        # путь где должен лежать исходный файл
         if source.exists():
+            #Источник существует 
+            self.logger.info(f"Источник по этому пути существует. КОПИРУЕМ")
             shutil.copy2(source, target)
+            if target.exists():
+                self.logger.info(f"Файл по пути {target} существует и продолжаем ")
+            else:
+                self.logger.info(f"Файл по пути {target} НЕ существует")
+
+
        
     def test_download(self, widget):
         try:
@@ -687,10 +731,11 @@ class Shift12H(toga.App):
             import os
             import shutil
 
-            # Файл лога внутри приложения
-            source = self.paths.data / "logs" / "shift12h.log"
+            source = get_log_file()
 
-            # Папка Download
+            print("Источник:")
+            print(source)
+
             from java import jclass
 
             Environment = jclass(
@@ -705,25 +750,23 @@ class Shift12H(toga.App):
 
             download_dir.mkdirs()
 
-            # Куда копируем
             destination = os.path.join(
                 str(download_dir),
                 "shift12h.log"
             )
 
-            # Копирование
             shutil.copy2(
                 source,
                 destination
             )
 
-            print("Лог скопирован:")
+            print("Лог успешно скопирован:")
             print(destination)
 
         except Exception as e:
-            print("ОШИБКА КОПИРОВАНИЯ:")
-            print(e)    
-
+            print("ОШИБКА:")
+            print(e)
+            
 
 def main():
     return Shift12H()

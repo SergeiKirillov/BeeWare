@@ -5,6 +5,64 @@ import shutil
 from pathlib import Path
 from logging.handlers import RotatingFileHandler
 
+"""
+# Инициализация модуля
+self.logger = setup_logging()
+
+#Запись значения в лог файл 
+self.logger.info("Выбрана дата: %s", datetime.today())
+self.logger.info("Приложение Shift12H запущен
+
+self.logger.warning("Файл personal.json не найден")
+
+try:
+    ...
+except Exception:
+    self.logger.exception("Ошибка при обработке данных")
+
+
+# Кнопка «Сохранить лог»
+btn_log = toga.Button(
+    "Сохранить лог",
+    on_press=self.save_log,
+)
+
+# И обработчик:
+    def save_log(self, widget):
+        import os
+        import shutil
+        try:
+            source = get_log_file()
+            print("SOURCE:", source)
+            print("EXISTS:", source.exists())
+            from java import jclass
+            Environment = jclass(
+                "android.os.Environment"
+            )
+            download_dir = (
+                Environment.getExternalStoragePublicDirectory(
+                    Environment.DIRECTORY_DOWNLOADS
+                )
+            )
+            download_dir.mkdirs()
+            destination = os.path.join(
+                str(download_dir),
+                "shift12h.log"
+            )
+            print("DESTINATION:", destination)
+            shutil.copy2(
+                source,
+                destination
+            )
+            print("COPY OK")
+        except Exception as e:
+            print("COPY ERROR:", repr(e))
+
+
+
+
+
+"""
 
 APP_LOG_NAME = "shift12h.log"
 
