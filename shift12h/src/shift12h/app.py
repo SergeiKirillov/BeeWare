@@ -239,7 +239,7 @@ class Shift12H(toga.App):
         #     text="Сохранить лог НА ТЕЛЕФОНЕ",
         #     group=settion_group,
         # )
-        select_file_command = toga.Command(
+        select_file_command_test = toga.Command(
             self.test_copy_log,
             text="Тест записи на телефон",
             group=settion_group,
@@ -257,7 +257,7 @@ class Shift12H(toga.App):
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
         self.main_window.size = (360, 740)
         self.main_window.content = content
-        self.commands.add(select_file_command)
+        self.commands.add(select_file_command_test)
         self.main_window.show()
 
     def save_log(self, widget):
