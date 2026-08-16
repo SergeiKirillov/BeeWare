@@ -144,7 +144,9 @@ class Shift12H(toga.App):
         self.btn1smena_brigada = toga.Button(
             "_", 
             style=BUTTON_STYLE,
-            on_press=self.open_brigade
+            #on_press=self.open_brigade
+            on_press=self.open_window
+            #on_press=self.open_dialog
             )
         self.btn2smena_brigada = toga.Button(
             "_", 
@@ -392,22 +394,26 @@ class Shift12H(toga.App):
         self.btn2smena_brigada.text = f"Бригада №{day}"
 
     def open_brigade(self, widget):
+        self.logger.info(f"-----Заходим в функцию нажатия на бригаду------")
         brigade_number = widget.text.replace("Бригада №", "")
 
         
         #worker_db = WorkerDB()
         personal_file = Path(self.paths.data) / "personal.json"
+        self.logger.info(f"Событие при нажатии на кнопку бригады / путь к файлу({personal_file})")
         worker_db = WorkerDB(personal_file)
         workers = worker_db.get_workers_by_brigade(brigade_number)
 
         if workers is not None:
+            self.logger.info(f"Кол-во найденных пользователей {workers}")
+            
             window = BrigadeWindows(
                                 self,
                                 brigade_number,
                              workers,
                             )
             window.show()
-        
+            
 
         # #self.show_workers(brigade_number)
         
@@ -766,7 +772,18 @@ class Shift12H(toga.App):
         except Exception as e:
             print("ОШИБКА:")
             print(e)
-            
+    # Пример создания второго окна по нажатию
+    def open_window(self, widget):
+        new_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
+        new_box.add(toga.Label('Это второе окно!', style=Pack(padding=5)))
+    
+        #self.win2 = toga.Window(title='Второе окно', size=(300, 200))
+        self.main_window.content = new_box
+        self.main_window.show() # Показываем окно   
+
+    async def open_dialog(self, widget):
+        await self.main_window.info_dialog("Заголовок", "Сообщение при нажатии")
+   
 
 def main():
     return Shift12H()
