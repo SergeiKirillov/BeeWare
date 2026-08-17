@@ -18,6 +18,7 @@ from shift12h.models.session import Session
 from shift12h.core.wotkerdb import WorkerDB
 from shift12h.worker_card import WorkerCard
 from shift12h.worker_card import BrigadeWindows
+from shift12h.worker_card import BrigadeWindows2
 
 #from shift12h.logger_1 import setup_logging
 #from shift12h.logger_1 import get_log_file, export_log_to_android
@@ -774,16 +775,32 @@ class Shift12H(toga.App):
             print(e)
     # Пример создания второго окна по нажатию
     def open_window(self, widget):
+        
         new_box = toga.Box(style=Pack(direction=COLUMN, padding=10))
-        new_box.add(toga.Label('Это второе окно!', style=Pack(padding=5)))
-    
-        #self.win2 = toga.Window(title='Второе окно', size=(300, 200))
+        brigade_number = widget.text.replace("Бригада №", "")
+        new_box.add(toga.Label(f"Бригада №{brigade_number}", style=Pack(padding=5)))
+        self.logger.info(f"-----Заходим в функцию отображения информации о бригаде №{brigade_number}------")
+        #worker_db = WorkerDB()
+        personal_file = Path(self.paths.data) / "personal.json"
+        self.logger.info(f"Событие инфо бригады -> путь к файлу({personal_file})")
+        worker_db = WorkerDB(personal_file)
+        workers = worker_db.get_workers_by_brigade(brigade_number)
+
+        if workers is not None:
+            self.logger.info(f"Кол-во найденных пользователей {workers}")
+            contentBr = BrigadeWindows2(self, brigade_number, workers,)
+            new_box = contentBr.content
+
+        #-----------------------------------------------------------------------------    
         self.main_window.content = new_box
         self.main_window.show() # Показываем окно   
 
     async def open_dialog(self, widget):
         await self.main_window.info_dialog("Заголовок", "Сообщение при нажатии")
-   
+
+    async def message_dialog(self, widget, title, message):
+        await self.main_window.info_dialog(title, message)
+
 
 def main():
     return Shift12H()
