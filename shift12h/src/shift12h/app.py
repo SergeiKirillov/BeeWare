@@ -152,7 +152,8 @@ class Shift12H(toga.App):
         self.btn2smena_brigada = toga.Button(
             "_", 
             style=BUTTON_STYLE,
-            on_press=self.open_brigade,
+            # on_press=self.open_brigade,  # Работает на linux, но не работает на Android
+            on_press=self.open_window  #Работает на linux, работает на Android
             )
 
         box_content_data=toga.Box(
@@ -214,7 +215,7 @@ class Shift12H(toga.App):
 
 
         # Основной контейнер
-        content = toga.Box(
+        self.content = toga.Box(
             children=[
                 box_data_select,
                 box_content,
@@ -260,7 +261,7 @@ class Shift12H(toga.App):
 
         self.main_window = toga.MainWindow(title="Программа для отображения информации о ночной и дневной смене")
         self.main_window.size = (360, 740)
-        self.main_window.content = content
+        self.main_window.content = self.content
         self.commands.add(select_file_command_save)
         self.main_window.show()
 
@@ -406,7 +407,7 @@ class Shift12H(toga.App):
         workers = worker_db.get_workers_by_brigade(brigade_number)
 
         if workers is not None:
-            self.logger.info(f"Кол-во найденных пользователей {workers}")
+            #self.logger.info(f"Кол-во найденных пользователей {workers}")
             
             window = BrigadeWindows(
                                 self,
@@ -458,9 +459,6 @@ class Shift12H(toga.App):
         #print(toga.__version__)
         #print(hasattr(toga, "OpenFileDialog"))
         #print(hasattr(toga, "FileDialog"))
-
-        
-                
 
         try:
              # ---------------------------------------------------------
@@ -787,13 +785,13 @@ class Shift12H(toga.App):
         workers = worker_db.get_workers_by_brigade(brigade_number)
 
         if workers is not None:
-            self.logger.info(f"Кол-во найденных пользователей {workers}")
+            #self.logger.info(f"Кол-во найденных пользователей {workers}")
             contentBr = BrigadeWindows2(self, brigade_number, workers,)
             new_box = contentBr.content
-
-        #-----------------------------------------------------------------------------    
-        self.main_window.content = new_box
-        self.main_window.show() # Показываем окно   
+            new_box.add(toga.Button("Вернуться назад", on_press=lambda widget: setattr(widget.window, 'content', self.content),))
+            #-----------------------------------------------------------------------------    
+            self.main_window.content = new_box
+            self.main_window.show() # Показываем окно   
 
     async def open_dialog(self, widget):
         await self.main_window.info_dialog("Заголовок", "Сообщение при нажатии")

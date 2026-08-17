@@ -236,6 +236,7 @@ class BrigadeWindows2:
             card.add(phone)
 
             self.content.add(card)
+        
 
     # def call_worker(self, phone):
     #     print(f"Звоним: {phone}")
