@@ -244,11 +244,11 @@ class Shift12H(toga.App):
         #     text="Сохранить лог НА ТЕЛЕФОНЕ",
         #     group=settion_group,
         # )
-        # select_file_command_test = toga.Command(
-        #     self.test_copy_log,
-        #     text="Тест записи на телефон",
-        #     group=settion_group,
-        # )
+        select_db_command_load = toga.Command(
+             self.load_db_personal,
+             text="Загрузка новой базы",
+             group=settion_group,
+         )
             
         select_file_command_save = toga.Command(
              self.save_log,
@@ -263,6 +263,7 @@ class Shift12H(toga.App):
         self.main_window.size = (360, 740)
         self.main_window.content = self.content
         self.commands.add(select_file_command_save)
+        self.commands.add(select_db_command_load)
         self.main_window.show()
 
     def save_log_0(self, widget):
@@ -796,9 +797,13 @@ class Shift12H(toga.App):
     async def open_dialog(self, widget):
         await self.main_window.info_dialog("Заголовок", "Сообщение при нажатии")
 
-    async def message_dialog(self, widget, title, message):
+    async def message_dialog(self, title, message):
         await self.main_window.info_dialog(title, message)
 
+    def load_db_personal(self, widget):
+        db_box_load = toga.Box(style=Pack(direction=COLUMN, padding=10))
+        self.logger.info(f"-----Заходим в функцию загрузки в приложение новой БД ")
+        
 
 def main():
     return Shift12H()
